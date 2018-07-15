@@ -26,6 +26,8 @@ public:
 
     void testPattern();
 
+    void renderSinglePixel(uint8_t pixel);
+
     void clearAll();
 
     static FatBike &getInstance() {

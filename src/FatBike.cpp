@@ -69,3 +69,8 @@ void FatBike::testPattern() {
 //        leds[i] = CRGB::Black;
 //    }
 }
+
+void FatBike::renderSinglePixel(uint8_t pixel) {
+    leds[pixel] = CRGB::White;
+}
+
