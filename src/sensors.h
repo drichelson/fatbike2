@@ -1,17 +1,16 @@
 #include <Mahony.h>
-#include "NXPMotionSense/NXPMotionSense.h"
+#include <NXPMotionSense.h>
+//#include "NXPMotionSense/NXPMotionSense.h"
 
 NXPMotionSense imu;
 
 //slower:
-//NXPSensorFusion filter;
+NXPSensorFusion filter;
 
 //faster:
-Mahony filter;
+//Mahony filter;
 
 #define PIXELS_BETWEEN_SENSOR_AND_ZERO_PIXEL 20.0F
-
-
 
 float ax, ay, az;
 float gx, gy, gz;
@@ -117,7 +116,8 @@ void sensorsUpdate() {
 uint8_t getPixelOnGround() {
     return getPixelOnGround(0);
 }
-void sensorsForVisualizer(){
+
+void sensorsForVisualizer() {
     float ax, ay, az;
     float gx, gy, gz;
     float mx, my, mz;
