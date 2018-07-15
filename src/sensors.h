@@ -15,16 +15,20 @@ NXPSensorFusion filter;
 float ax, ay, az;
 float gx, gy, gz;
 float mx, my, mz;
+// yaw == heading
 float roll, pitch, yaw;
 
 uint32_t loopCount = 0;
 uint32_t start = 0;
 uint32_t elapsed = 0;
 
-void sensorsUpdate();
+boolean sensorsUpdate();
 
 void initSensors() {
+    Serial.println("initSensors()");
+    Serial.println("imu.begin()");
     imu.begin();
+    Serial.println("filter.begin()");
     filter.begin(100);
     for (int i = 0; i < 1000; ++i) {
         sensorsUpdate();
@@ -106,11 +110,18 @@ uint8_t getPixelOnGround(float mph) {
 //    return (uint8_t) digitalSmooth(pixelOnGround, pixelOnGroundSmoothingArray);
 }
 
-void sensorsUpdate() {
-    imu.readMotionSensor(ax, ay, az, gx, gy, gz);
+// Reads sensors and updates filter. Returns true if new data was read.
+boolean sensorsUpdate() {
+    if (imu.available()) {
+        imu.readMotionSensor(ax, ay, az, gx, gy, gz, mx, my, mz);
 
-    // Update the SensorFusion filter
-    filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
+        // Update the SensorFusion filter
+        filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
+        return true;
+    } else {
+        return false;
+    }
+
 }
 
 uint8_t getPixelOnGround() {
@@ -118,24 +129,13 @@ uint8_t getPixelOnGround() {
 }
 
 void sensorsForVisualizer() {
-    float ax, ay, az;
-    float gx, gy, gz;
-    float mx, my, mz;
-    float roll, pitch, heading;
-
-    if (imu.available()) {
-        // Read the motion sensors
-        imu.readMotionSensor(ax, ay, az, gx, gy, gz, mx, my, mz);
-
-        // Update the SensorFusion filter
-        filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
-
+    if (sensorsUpdate()) {
         // print the heading, pitch and roll
         roll = filter.getRoll();
         pitch = filter.getPitch();
-        heading = filter.getYaw();
+        yaw = filter.getYaw();
         Serial.print("Orientation: ");
-        Serial.print(heading);
+        Serial.print(yaw);
         Serial.print(" ");
         Serial.print(pitch);
         Serial.print(" ");
