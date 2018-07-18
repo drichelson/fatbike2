@@ -14,6 +14,10 @@ NXPSensorFusion filter;
 //Mahony filter;
 
 #define PIXELS_BETWEEN_SENSOR_AND_ZERO_PIXEL 20.0F
+// observed extremes of ax accelerometer value
+#define  AX_MAX 1.0f
+#define AX_MIN -0.97f
+
 
 float ax, ay, az;
 float gx, gy, gz;
@@ -26,6 +30,7 @@ uint32_t start = 0;
 uint32_t elapsed = 0;
 
 boolean sensorsUpdate();
+
 void initSensors() {
     Serial.println("initSensors()");
     Serial.println("imu.begin()");
@@ -88,39 +93,38 @@ float sensorPitchTo360Scale(float sensorDegrees) {
     }
 }
 
+//TODO: optimize?
 // returns 0-359
-uint16_t getOrientation() {
-//    float ayMax = 1.0f;
-//    float ayMin = -0.97f;
+float getOrientation() {
     // we're on a 'cardinal' direction
-    if (ax > -0.01 && ax < 0.01) {
+    if (ax > -0.001 && ax < 0.001) {
         if (ay > 0.0) return 90;
         else return 270;
     }
-    if (ay > -0.01 && ay < 0.01) {
+    if (ay > -0.001 && ay < 0.001) {
         if (ax > 0.0) return 0;
         else return 180;
     }
 
     if (ax > 0.0) {
         if (ay > 0.0) {
-            return 45;
             // top right quadrant: 0-90 degrees
+            return 90.0 - (90.0 * ax / AX_MAX);
         } else {
-            return 315;
             // top left quadrant: 270-360/0
+            float o = 270.0 + (90.0 * ax / AX_MAX);
+            if (o > 359.99) return 0;
+            return o;
         }
     } else {
         if (ay > 0.0) {
-            return 135;
             // bottom right quadrant: 90-180 degrees
+            return 90.0 + (90.0 * ax / AX_MIN);
         } else {
-            return 225;
             // bottom left quadrant: 180-270
+            return 270.0 - (90.0 * ax / AX_MIN);
         }
     }
-
-
 }
 
 
@@ -195,31 +199,31 @@ void sensorsForVisualizer() {
 }
 
 void printSensorsForCsv() {
-        // print the heading, pitch and roll
-        yaw = filter.getYaw();
-        pitch = filter.getPitch();
-        roll = filter.getRoll();
-        float elapsedSeconds = millis() / 1000.0f;
-        Serial.print(elapsedSeconds);
-        Serial.print(", ");
-        Serial.print(yaw);
-        Serial.print(",  ");
-        Serial.print(pitch);
-        Serial.print(",  ");
-        Serial.println(roll);
+    // print the heading, pitch and roll
+    yaw = filter.getYaw();
+    pitch = filter.getPitch();
+    roll = filter.getRoll();
+    float elapsedSeconds = millis() / 1000.0f;
+    Serial.print(elapsedSeconds);
+    Serial.print(", ");
+    Serial.print(yaw);
+    Serial.print(",  ");
+    Serial.print(pitch);
+    Serial.print(",  ");
+    Serial.println(roll);
 }
 
 void printSensorsForArduinoPlotter() {
-        // print the heading, pitch and roll
+    // print the heading, pitch and roll
 //        yaw = filter.getYaw();
 //        pitch = filter.getPitch();
-        roll = filter.getRoll();
+    roll = filter.getRoll();
 //        float elapsedSeconds = millis() / 1000.0f;
 //        Serial.print(elapsedSeconds);
 //        Serial.print(", ");
-        Serial.print(yaw);
-        Serial.print(" ");
+    Serial.print(yaw);
+    Serial.print(" ");
 //        Serial.print(pitch);
 //        Serial.print(" ");
-        Serial.println(roll);
+    Serial.println(roll);
 }
