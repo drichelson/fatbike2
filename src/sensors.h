@@ -1,5 +1,8 @@
-#include <Mahony.h>
+//#include <Mahony.h>
 #include <NXPMotionSense.h>
+//#include "MahonyAHRS.h"
+
+
 //#include "NXPMotionSense/NXPMotionSense.h"
 
 NXPMotionSense imu;
@@ -23,16 +26,21 @@ uint32_t start = 0;
 uint32_t elapsed = 0;
 
 boolean sensorsUpdate();
-
 void initSensors() {
     Serial.println("initSensors()");
     Serial.println("imu.begin()");
     imu.begin();
     Serial.println("filter.begin()");
     filter.begin(100);
-    for (int i = 0; i < 1000; ++i) {
-        sensorsUpdate();
-    }
+    Serial.print("Starting sensor warmup: ");
+    Serial.println(millis());
+//    for (int i = 0; i < 1000; ) {
+//        if (sensorsUpdate()){
+//            i++;
+//        }
+//    }
+    Serial.print("Finished sensor warmup: ");
+    Serial.println(millis());
 }
 
 
@@ -80,8 +88,46 @@ float sensorPitchTo360Scale(float sensorDegrees) {
     }
 }
 
+// returns 0-359
+uint16_t getOrientation() {
+//    float ayMax = 1.0f;
+//    float ayMin = -0.97f;
+    // we're on a 'cardinal' direction
+    if (ax > -0.01 && ax < 0.01) {
+        if (ay > 0.0) return 90;
+        else return 270;
+    }
+    if (ay > -0.01 && ay < 0.01) {
+        if (ax > 0.0) return 0;
+        else return 180;
+    }
+
+    if (ax > 0.0) {
+        if (ay > 0.0) {
+            return 45;
+            // top right quadrant: 0-90 degrees
+        } else {
+            return 315;
+            // top left quadrant: 270-360/0
+        }
+    } else {
+        if (ay > 0.0) {
+            return 135;
+            // bottom right quadrant: 90-180 degrees
+        } else {
+            return 225;
+            // bottom left quadrant: 180-270
+        }
+    }
+
+
+}
+
 
 uint8_t getPixelOnGround(float mph) {
+
+
+    // old code:
 //    long startMicros = micros();
     sensorsUpdate();
 
@@ -116,7 +162,7 @@ boolean sensorsUpdate() {
         imu.readMotionSensor(ax, ay, az, gx, gy, gz, mx, my, mz);
 
         // Update the SensorFusion filter
-        filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
+//        filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
         return true;
     } else {
         return false;
@@ -131,14 +177,49 @@ uint8_t getPixelOnGround() {
 void sensorsForVisualizer() {
     if (sensorsUpdate()) {
         // print the heading, pitch and roll
-        roll = filter.getRoll();
-        pitch = filter.getPitch();
+//        yaw = filter.getYaw();
+//        pitch = filter.getPitch();
+//        roll = filter.getRoll();
+        Serial.print(ax);
+        Serial.print(",");
+        Serial.print(ay);
+        Serial.print(",");
+        Serial.print(az);
+        Serial.print(",");
+        Serial.print(gx);
+        Serial.print(",");
+        Serial.print(gy);
+        Serial.print(",");
+        Serial.println(gz);
+    }
+}
+
+void printSensorsForCsv() {
+        // print the heading, pitch and roll
         yaw = filter.getYaw();
-        Serial.print("Orientation: ");
+        pitch = filter.getPitch();
+        roll = filter.getRoll();
+        float elapsedSeconds = millis() / 1000.0f;
+        Serial.print(elapsedSeconds);
+        Serial.print(", ");
+        Serial.print(yaw);
+        Serial.print(",  ");
+        Serial.print(pitch);
+        Serial.print(",  ");
+        Serial.println(roll);
+}
+
+void printSensorsForArduinoPlotter() {
+        // print the heading, pitch and roll
+//        yaw = filter.getYaw();
+//        pitch = filter.getPitch();
+        roll = filter.getRoll();
+//        float elapsedSeconds = millis() / 1000.0f;
+//        Serial.print(elapsedSeconds);
+//        Serial.print(", ");
         Serial.print(yaw);
         Serial.print(" ");
-        Serial.print(pitch);
-        Serial.print(" ");
+//        Serial.print(pitch);
+//        Serial.print(" ");
         Serial.println(roll);
-    }
 }
