@@ -13,10 +13,11 @@ NXPSensorFusion filter;
 //faster:
 //Mahony filter;
 
-#define PIXELS_BETWEEN_SENSOR_AND_ZERO_PIXEL 20.0F
+#define PIXELS_BETWEEN_SENSOR_AND_ZERO_PIXEL 119.0F
 // observed extremes of ax accelerometer value
 #define  AX_MAX 1.0f
-#define AX_MIN -0.97f
+#define AX_MIN (-1.0f)
+//#define AX_MIN (-0.97f)
 
 
 float ax, ay, az;
@@ -96,44 +97,49 @@ float sensorPitchTo360Scale(float sensorDegrees) {
 //TODO: optimize?
 // returns 0-359
 float getOrientation() {
-    // we're on a 'cardinal' direction
-    if (ax > -0.001 && ax < 0.001) {
-        if (ay > 0.0) return 90;
-        else return 270;
-    }
-    if (ay > -0.001 && ay < 0.001) {
-        if (ax > 0.0) return 0;
-        else return 180;
-    }
+
+    // roll
+//    roll = atan2(y_Buff , z_Buff) * 57.3;
+
+    // pitch
+    float rawOrientation = atan2((-ax), sqrt(ay * ay + az * az)) * RAD_TO_DEG;
+    float orientation;
 
     if (ax > 0.0) {
-        if (ay > 0.0) {
-            // top right quadrant: 0-90 degrees
-            return 90.0 - (90.0 * ax / AX_MAX);
-        } else {
-            // top left quadrant: 270-360/0
-            float o = 270.0 + (90.0 * ax / AX_MAX);
-            if (o > 359.99) return 0;
-            return o;
-        }
+        // top hemishpere
+        orientation = rawOrientation * 1.083032491F;
     } else {
-        if (ay > 0.0) {
-            // bottom right quadrant: 90-180 degrees
-            return 90.0 + (90.0 * ax / AX_MIN);
+        // bottom hemisphere
+        orientation = rawOrientation * 1.043478261F;
+    }
+
+    if (ay >= 0.0F) {
+        // right side
+        return orientation + 90.0F;
+    } else {
+        // left side
+        if (ax <= 0.0F) {
+            return 270.0F + orientation;
         } else {
-            // bottom left quadrant: 180-270
-            return 270.0 - (90.0 * ax / AX_MIN);
+            orientation = 270.0F + (-1.0F * orientation);
+            if (orientation >= 359.99F) {
+                return 0.0F;
+            }
+            return orientation;
         }
     }
 }
 
 
 uint8_t getPixelOnGround(float mph) {
-
+    float orientationDegrees = getOrientation();
+    Serial.print("Orientation: ");
+    Serial.println(orientationDegrees);
+    float shiftedPixel = (uint8_t) ((orientationDegrees / 360.0F) * (NUM_LEDS - 1.0F));
 
     // old code:
 //    long startMicros = micros();
-    sensorsUpdate();
+//    sensorsUpdate();
 
 //    pitch = filter.getPitch();
 //    Serial.print("Pitch: ");
@@ -147,16 +153,16 @@ uint8_t getPixelOnGround(float mph) {
 //    Serial.print(" Yaw: ");
 //    Serial.println(yaw);
 
-    float normalizedDegrees = sensorPitchTo360Scale(pitch);
+//    float normalizedDegrees = sensorPitchTo360Scale(pitch);
 
-    uint8_t thisPixel = (uint8_t) ((normalizedDegrees / 360.0F) * (NUM_LEDS - 1));
+//    uint8_t thisPixel = (uint8_t) ((normalizedDegrees / 360.0F) * (NUM_LEDS - 1));
 
 //    float timeMicros = micros() - startMicros ;
 //    Serial.print(F("Accel getPixelOnGround time (micros):  "));
 //    Serial.println(timeMicros);
 
-    int speedFactor = mph * 3.0; //magic!
-    return (uint8_t) FatBike::Forward(thisPixel, PIXELS_BETWEEN_SENSOR_AND_ZERO_PIXEL - speedFactor);
+//    int speedFactor = mph * 3.0; //magic!
+    return (uint8_t) FatBike::Forward(shiftedPixel, PIXELS_BETWEEN_SENSOR_AND_ZERO_PIXEL);
 //    return (uint8_t) digitalSmooth(pixelOnGround, pixelOnGroundSmoothingArray);
 }
 
