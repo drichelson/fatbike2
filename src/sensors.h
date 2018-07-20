@@ -119,8 +119,10 @@ float getOrientation() {
     } else {
         // left side
         if (ax <= 0.0F) {
-            return 270.0F + orientation;
+            // bottom left
+            return 270.0F - orientation;
         } else {
+            // top left
             orientation = 270.0F + (-1.0F * orientation);
             if (orientation >= 359.99F) {
                 return 0.0F;
@@ -133,10 +135,12 @@ float getOrientation() {
 
 uint8_t getPixelOnGround(float mph) {
     float orientationDegrees = getOrientation();
-    Serial.print("Orientation: ");
-    Serial.println(orientationDegrees);
-    float shiftedPixel = (uint8_t) ((orientationDegrees / 360.0F) * (NUM_LEDS - 1.0F));
-
+//    Serial.print("Orientation: ");
+//    Serial.print(orientationDegrees);
+    float shiftedPixel = (orientationDegrees / 360.0F) * (NUM_LEDS - 1.0F);
+//    Serial.print(", shiftedPixel: ");
+//    Serial.println(shiftedPixel);
+//    return static_cast<uint8_t>(shiftedPixel);
     // old code:
 //    long startMicros = micros();
 //    sensorsUpdate();
@@ -162,7 +166,7 @@ uint8_t getPixelOnGround(float mph) {
 //    Serial.println(timeMicros);
 
 //    int speedFactor = mph * 3.0; //magic!
-    return (uint8_t) FatBike::Forward(shiftedPixel, PIXELS_BETWEEN_SENSOR_AND_ZERO_PIXEL);
+    return (uint8_t) FatBike::Forward(shiftedPixel, NUM_LEDS / 2.0F);
 //    return (uint8_t) digitalSmooth(pixelOnGround, pixelOnGroundSmoothingArray);
 }
 
