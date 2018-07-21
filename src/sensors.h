@@ -31,6 +31,9 @@ void initSensors() {
     Serial.println("initSensors()");
     Serial.println("imu.begin()");
     imu.begin();
+    sensorsUpdate();
+    random16_set_seed(static_cast<uint16_t>(micros() / (ax + 0.0001 )));
+
 //    Serial.println("filter.begin()");
 //    filter.begin(100);
 //    Serial.print("Starting sensor warmup: ");
