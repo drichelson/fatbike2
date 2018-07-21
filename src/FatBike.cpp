@@ -70,6 +70,6 @@ void FatBike::testPattern() {
 }
 
 void FatBike::renderSinglePixel(uint8_t pixel) {
-    leds[pixel] = CRGB::White;
+    leds[pixel] = CRGB::Green;
 }
 

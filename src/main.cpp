@@ -16,7 +16,7 @@ boolean isMovingMode = false;
 Fire *fire;
 FatBike *fatBike;
 
-const uint32_t maxFps = 65;
+const uint32_t maxFps = 61;
 const uint32_t microsPerFrame = 1000000 / maxFps;
 
 
@@ -65,9 +65,10 @@ void loop() {
     if (sensorsUpdate()) {
         pixelOnGround = getPixelOnGround();
         sensorUpdateCount++;
-//            fatBike->renderSinglePixel(pixelOnGround);
     }
     fire->renderDoubleFire(pixelOnGround, bikeSpeedMph, isMovingMode, frameCount);
+//    fatBike->renderSinglePixel(pixelOnGround);
+
 
 //END ANIMATION-SPECIFIC CODE
 
