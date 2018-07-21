@@ -9,7 +9,7 @@
 #define NUM_STRIPS 8
 #define DATA_PIN 6
 #define MAX_FPS 60
-#define GLOBAL_BRIGHTNESS 60
+#define GLOBAL_BRIGHTNESS 32
 
 //Singleton to make all the other things easier.
 class FatBike {

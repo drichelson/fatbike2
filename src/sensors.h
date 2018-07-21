@@ -31,13 +31,15 @@ uint32_t start = 0;
 uint32_t elapsed = 0;
 
 boolean sensorsUpdate();
+void addSensorEntropy();
 
 void initSensors() {
     Serial.println("initSensors()");
     Serial.println("imu.begin()");
     imu.begin();
-    Serial.println("filter.begin()");
-    filter.begin(100);
+    addSensorEntropy();
+//    Serial.println("filter.begin()");
+//    filter.begin(100);
     Serial.print("Starting sensor warmup: ");
     Serial.println(millis());
 //    for (int i = 0; i < 1000; ) {
@@ -94,7 +96,6 @@ float sensorPitchTo360Scale(float sensorDegrees) {
     }
 }
 
-//TODO: optimize?
 // returns 0-359
 float getOrientation() {
 
@@ -135,37 +136,7 @@ float getOrientation() {
 
 uint8_t getPixelOnGround(float mph) {
     float orientationDegrees = getOrientation();
-//    Serial.print("Orientation: ");
-//    Serial.print(orientationDegrees);
     float shiftedPixel = (orientationDegrees / 360.0F) * (NUM_LEDS - 1.0F);
-//    Serial.print(", shiftedPixel: ");
-//    Serial.println(shiftedPixel);
-//    return static_cast<uint8_t>(shiftedPixel);
-    // old code:
-//    long startMicros = micros();
-//    sensorsUpdate();
-
-//    pitch = filter.getPitch();
-//    Serial.print("Pitch: ");
-//    Serial.println(pitch);
-
-//    roll = filter.getRoll();
-//    Serial.print(" Roll: ");
-//    Serial.print(roll);
-//
-//    yaw = filter.getYaw();
-//    Serial.print(" Yaw: ");
-//    Serial.println(yaw);
-
-//    float normalizedDegrees = sensorPitchTo360Scale(pitch);
-
-//    uint8_t thisPixel = (uint8_t) ((normalizedDegrees / 360.0F) * (NUM_LEDS - 1));
-
-//    float timeMicros = micros() - startMicros ;
-//    Serial.print(F("Accel getPixelOnGround time (micros):  "));
-//    Serial.println(timeMicros);
-
-//    int speedFactor = mph * 3.0; //magic!
     return (uint8_t) FatBike::Forward(shiftedPixel, NUM_LEDS / 2.0F);
 //    return (uint8_t) digitalSmooth(pixelOnGround, pixelOnGroundSmoothingArray);
 }
@@ -181,12 +152,18 @@ boolean sensorsUpdate() {
     } else {
         return false;
     }
-
 }
 
 uint8_t getPixelOnGround() {
     return getPixelOnGround(0);
 }
+
+void addSensorEntropy() {
+    random16_add_entropy((uint16_t) (micros() / mx));
+    random16_add_entropy((uint16_t) (micros() + my));
+    random16_add_entropy((uint16_t) (micros() - gx));
+}
+
 
 void sensorsForVisualizer() {
     if (sensorsUpdate()) {

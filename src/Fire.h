@@ -200,9 +200,9 @@ public:
 
         //Render one side:
         for (int j = 0; j < 120; j++) {
-            // Scale the heat value from 0-255 down to 0-240
+            // Scale the heat value from 0-255 down to 0-239
             // for best results with color palettes.
-            byte colorindex = scale8(heat[j], 240);
+            byte colorindex = scale8(heat[j], 239);
             fatBike.leds[(int) thisPixel] = ColorFromPalette(gPal, colorindex);
             thisPixel = FatBike::Back1(thisPixel);
         }
@@ -210,9 +210,9 @@ public:
         //Render the other side:
         thisPixel = FatBike::Forward1(pixelOnGround);
         for (int j = 120; j < 239; j++) {
-            // Scale the heat value from 0-255 down to 0-240
+            // Scale the heat value from 0-255 down to 0-239
             // for best results with color palettes.
-            byte colorindex = scale8(heat[j], 240);
+            byte colorindex = scale8(heat[j], 239);
             fatBike.leds[(int) thisPixel] = ColorFromPalette(gPal, colorindex);
             thisPixel = FatBike::Forward1(thisPixel);
         }
@@ -226,7 +226,6 @@ public:
         uint8_t minSparking = 50;
 
         uint8_t rando = random8();
-        uint8_t rando1to5 = (rando / 63) + 1;
         cooling = minCooling + scale8(sin8((uint8_t) (frameCount / 5 % 255)), maxCooling - minCooling);
         sparking = minSparking + scale8(cos8((uint8_t) (frameCount / 6 % 255)), maxSparking - minSparking);
 //        Serial.print(cooling);
