@@ -4,7 +4,7 @@
 #include <FastLED.h>
 
 #define NUM_LEDS 239.0F
-#define MAX_FPS 60
+#define MAX_FPS 500
 #define GLOBAL_BRIGHTNESS 32
 
 //Singleton to make all the other things easier.

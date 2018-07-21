@@ -7,13 +7,17 @@
 #include "sensors.h"
 #include "Fire.h"
 
-long frameCount = 0L;
+uint32_t frameCount = 0;
+uint32_t sensorUpdateCount = 0;
 uint8_t pixelOnGround = 0;
 float bikeSpeedMph = 0.0F;
 boolean isMovingMode = false;
 
 Fire *fire;
 FatBike *fatBike;
+
+const uint32_t maxFps = 65;
+const uint32_t microsPerFrame = 1000000 / maxFps;
 
 
 void setup() {
@@ -44,44 +48,23 @@ void setup() {
 }
 
 void loop() {
-//    if (sensorsUpdate()){
-//        Serial.println(getOrientation());
-//    }
-//    sensorsForVisualizer();
-//    return;
-//    sensorsUpdate();
-//    if (frameCount % 100 == 0) {
-//        Serial.println(pixelOnGround);
-//        printSensorsForCsv();
-//        printSensorsForArduinoPlotter();
-
-
-//    return;
-
+    uint32_t startMicros = micros();
     if (frameCount % 600 == 0) {
         addSensorEntropy();
         Serial.print(F("FPS: "));
         Serial.print(FastLED.getFPS());
         Serial.println(F(""));
+
+        Serial.print(F("sensor updates/600 frames: "));
+        Serial.println(sensorUpdateCount);
+        sensorUpdateCount = 0;
     }
-//    pitch = filter.getPitch();
-//    Serial.print("Pitch: ");
-//    Serial.print(pitch);
-
-//    roll = filter.getRoll();
-//    Serial.print(" Roll: ");
-//    Serial.print(roll);
-
-//    yaw = filter.getYaw();
-//    Serial.print(" Yaw: ");
-//    Serial.println(yaw);
-//}
 
 //BEGIN ANIMATION-SPECIFIC CODE
 
-//    test();
     if (sensorsUpdate()) {
         pixelOnGround = getPixelOnGround();
+        sensorUpdateCount++;
 //            fatBike->renderSinglePixel(pixelOnGround);
     }
     fire->renderDoubleFire(pixelOnGround, bikeSpeedMph, isMovingMode, frameCount);
@@ -90,8 +73,11 @@ void loop() {
 
     FastLED.show();
     fatBike->clearAll();
-//    delay(50);
-
     frameCount++;
 
+    uint32_t endMicros = micros();
+    uint32_t elapsedMicros = endMicros - startMicros;
+    if (elapsedMicros < microsPerFrame) {
+        delayMicroseconds(microsPerFrame - elapsedMicros);
+    }
 }
