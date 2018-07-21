@@ -1,13 +1,10 @@
 //#define USE_OCTOWS2811
 
 #include "Arduino.h"
-//#include <OctoWS2811.h>
 #include <FastLED.h>
 #include <util/crc16.h>
 #include "FatBike.h"
-//#include "FatBike.cpp"
 #include "sensors.h"
-//#include "flash.h"
 #include "Fire.h"
 
 long frameCount = 0L;
@@ -20,13 +17,12 @@ FatBike *fatBike;
 
 
 void setup() {
-    // this breaks after platformio update:
-//    _crc16_update(1, 0);
     delay(3000);
     Serial.begin(115200);
     Serial.println(F("Starting..."));
 
     initSensors();
+    addSensorEntropy();
 //    Serial.println("s, yaw, pitch, roll");
 
 //    test();
@@ -39,7 +35,12 @@ void setup() {
 
     fire = &Fire::getInstance();
     fatBike = &FatBike::getInstance();
-
+    addSensorEntropy();
+    addSensorEntropy();
+    addSensorEntropy();
+    addSensorEntropy();
+    addSensorEntropy();
+    addSensorEntropy();
 }
 
 void loop() {
@@ -57,13 +58,12 @@ void loop() {
 
 //    return;
 
-    if (frameCount % 100 == 0) {
+    if (frameCount % 600 == 0) {
         addSensorEntropy();
+        Serial.print(F("FPS: "));
+        Serial.print(FastLED.getFPS());
+        Serial.println(F(""));
     }
-//        Serial.print(F("FPS: "));
-//        Serial.print(FastLED.getFPS());
-//        Serial.println(F(""));
-
 //    pitch = filter.getPitch();
 //    Serial.print("Pitch: ");
 //    Serial.print(pitch);

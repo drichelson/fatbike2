@@ -31,7 +31,6 @@ float FatBike::Back1(float thisPixel) {
 }
 
 float FatBike::Back(float thisPixel, float shiftAmount) {
-//    Serial.println(shiftAmount);
     float newPosition = thisPixel - shiftAmount;
     if (newPosition >= 0) {
         return newPosition;

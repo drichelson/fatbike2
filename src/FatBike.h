@@ -3,11 +3,7 @@
 
 #include <FastLED.h>
 
-//#define USE_OCTOWS2811
-//#define NUM_LEDS 243.0F
 #define NUM_LEDS 239.0F
-#define NUM_STRIPS 8
-#define DATA_PIN 6
 #define MAX_FPS 60
 #define GLOBAL_BRIGHTNESS 32
 

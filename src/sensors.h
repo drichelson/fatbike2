@@ -1,10 +1,4 @@
-//#include <Mahony.h>
 #include <NXPMotionSense.h>
-//#include "MahonyAHRS.h"
-
-
-//#include "NXPMotionSense/NXPMotionSense.h"
-
 NXPMotionSense imu;
 
 //slower:
@@ -37,18 +31,17 @@ void initSensors() {
     Serial.println("initSensors()");
     Serial.println("imu.begin()");
     imu.begin();
-    addSensorEntropy();
 //    Serial.println("filter.begin()");
 //    filter.begin(100);
-    Serial.print("Starting sensor warmup: ");
-    Serial.println(millis());
+//    Serial.print("Starting sensor warmup: ");
+//    Serial.println(millis());
 //    for (int i = 0; i < 1000; ) {
 //        if (sensorsUpdate()){
 //            i++;
 //        }
 //    }
-    Serial.print("Finished sensor warmup: ");
-    Serial.println(millis());
+//    Serial.print("Finished sensor warmup: ");
+//    Serial.println(millis());
 }
 
 
