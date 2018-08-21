@@ -50,23 +50,27 @@ void FatBike::testPattern() {
     for (uint8_t i = 0; i < NUM_LEDS; i++) {
         leds[i] = CRGB::White;
         FastLED.show();
+        delay(2);
         leds[i] = CRGB::Black;
     }
-//    for (uint8_t i = 0; i < NUM_LEDS; i++) {
-//        leds[i] = CRGB::Red;
-//        FastLED.show();
-//        leds[i] = CRGB::Black;
-//    }
-//    for (uint8_t i = 0; i < NUM_LEDS; i++) {
-//        leds[i] = CRGB::Green;
-//        FastLED.show();
-//        leds[i] = CRGB::Black;
-//    }
-//    for (uint8_t i = 0; i < NUM_LEDS; i++) {
-//        leds[i] = CRGB::Blue;
-//        FastLED.show();
-//        leds[i] = CRGB::Black;
-//    }
+    for (uint8_t i = 0; i < NUM_LEDS; i++) {
+        leds[i] = CRGB::Red;
+        FastLED.show();
+        delay(2);
+        leds[i] = CRGB::Black;
+    }
+    for (uint8_t i = 0; i < NUM_LEDS; i++) {
+        leds[i] = CRGB::Green;
+        FastLED.show();
+        delay(2);
+        leds[i] = CRGB::Black;
+    }
+    for (uint8_t i = 0; i < NUM_LEDS; i++) {
+        leds[i] = CRGB::Blue;
+        FastLED.show();
+        delay(2);
+        leds[i] = CRGB::Black;
+    }
 }
 
 void FatBike::renderSinglePixel(uint8_t pixel) {
